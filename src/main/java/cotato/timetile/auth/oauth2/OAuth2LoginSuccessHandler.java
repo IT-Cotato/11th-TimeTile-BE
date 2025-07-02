@@ -3,7 +3,7 @@ package cotato.timetile.auth.oauth2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cotato.timetile.auth.UserPrincipal;
 import cotato.timetile.auth.jwt.JwtProvider;
-import cotato.timetile.domain.user.api.response.LocalSignupResponse;
+import cotato.timetile.domain.user.api.response.LoginResponse;
 import cotato.timetile.global.common.CommonResponse;
 import cotato.timetile.global.common.SuccessResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +36,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
         response.getWriter().write(objectMapper.writeValueAsString(CommonResponse.success(
-                SuccessResponse.OK, LocalSignupResponse.of(accessToken, refreshToken))));
+                SuccessResponse.OK, LoginResponse.of(accessToken, refreshToken))));
     }
-    
+
 }
