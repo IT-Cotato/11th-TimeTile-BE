@@ -5,7 +5,7 @@ import cotato.timetile.auth.CustomLoginFailureHandler;
 import cotato.timetile.auth.UserPrincipal;
 import cotato.timetile.auth.jwt.JwtProvider;
 import cotato.timetile.domain.user.api.request.LocalLoginRequest;
-import cotato.timetile.domain.user.api.response.LocalSignupResponse;
+import cotato.timetile.domain.user.api.response.LoginResponse;
 import cotato.timetile.global.common.CommonResponse;
 import cotato.timetile.global.common.SuccessResponse;
 import cotato.timetile.global.exception.UnauthorizedException;
@@ -65,7 +65,7 @@ public class LocalAuthenticationFilter extends UsernamePasswordAuthenticationFil
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
         response.getWriter().write(objectMapper.writeValueAsString(
-                CommonResponse.success(SuccessResponse.OK, LocalSignupResponse.of(accessToken, refreshToken)))
+                CommonResponse.success(SuccessResponse.OK, LoginResponse.of(accessToken, refreshToken)))
         );
     }
 
