@@ -18,7 +18,8 @@ public record EventLoadMoreDto(
         List<String> relatedMaterials,
         LocalDate startedAt,
         LocalDate endedAt,
-        int contributorCount
+        int contributorCount,
+        int postCount
 ) {
     public static EventLoadMoreDto of(Event event, List<RelatedEventDto> relatedEvents) {
         return new EventLoadMoreDto(
@@ -33,7 +34,8 @@ public record EventLoadMoreDto(
                 event.getRelatedMaterials(),
                 event.getStartedAt(),
                 event.getEndedAt(),
-                event.getContributorCount()
+                event.getContributorCount(),
+                event.getPostCount()
         );
     }
 }
