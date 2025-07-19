@@ -3,6 +3,7 @@ package cotato.timetile.domain.user.api.request;
 import cotato.timetile.domain.user.domain.AuthProvider;
 import cotato.timetile.domain.user.domain.Role;
 import cotato.timetile.domain.user.domain.User;
+import cotato.timetile.global.common.Visibility;
 import cotato.timetile.global.util.EncryptUtil;
 import cotato.timetile.global.util.NicknameGenerator;
 import jakarta.validation.constraints.Email;
@@ -21,6 +22,7 @@ public record LocalSignupRequest(
                 .nickname(NicknameGenerator.generateNickname())
                 .provider(AuthProvider.LOCAL)
                 .role(Role.WATCHER)
+                .visibility(Visibility.PUBLIC)
                 .build();
     }
 }

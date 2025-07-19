@@ -6,6 +6,7 @@ import cotato.timetile.domain.user.domain.AuthProvider;
 import cotato.timetile.domain.user.domain.Role;
 import cotato.timetile.domain.user.domain.User;
 import cotato.timetile.domain.user.persistence.UserRepository;
+import cotato.timetile.global.common.Visibility;
 import cotato.timetile.global.util.NicknameGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -41,6 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .provider(provider)
                 .providerId(providerId)
                 .role(Role.WATCHER)
+                .visibility(Visibility.PUBLIC)
                 .build();
         return userRepository.save(user);
     }

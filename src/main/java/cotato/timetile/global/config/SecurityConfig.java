@@ -1,5 +1,6 @@
 package cotato.timetile.global.config;
 
+import cotato.timetile.auth.CustomAccessDeniedHandler;
 import cotato.timetile.auth.CustomAuthenticationEntryPoint;
 import cotato.timetile.auth.CustomLoginFailureHandler;
 import cotato.timetile.auth.CustomOAuth2UserService;
@@ -38,6 +39,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomLoginFailureHandler customLoginFailureHandler;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -71,6 +73,7 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 );
 
         return http.build();
