@@ -12,4 +12,8 @@ public class IOException extends CustomException {
         return new IOException(ErrorResponse.FAILED_FILE_UPLOAD);
     }
 
+    public static IOException external() {
+        return new IOException(ErrorResponse.TIMEOUT_EXTERNAL_SERVER);
+    }
+
 }
