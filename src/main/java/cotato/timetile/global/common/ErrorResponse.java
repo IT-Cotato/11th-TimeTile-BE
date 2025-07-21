@@ -11,6 +11,7 @@ public enum ErrorResponse {
 
     INVALID_USER(HttpStatus.UNAUTHORIZED, "AUTH001", "존재하지 않는 유저"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH002", "유효하지 않은 토큰"),
+    UNVERIFIED_USER(HttpStatus.UNAUTHORIZED, "AUTH002", "인증되지 않음"),
 
     INVALID_PROVIDER(HttpStatus.FORBIDDEN, "AUTH003", "유효하지 않은 로그인 방식"),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "AUTH004", "접근 권한 없음"),
