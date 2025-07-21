@@ -9,6 +9,7 @@ import cotato.timetile.domain.user.api.response.LoginResponse;
 import cotato.timetile.global.common.CommonResponse;
 import cotato.timetile.global.common.SuccessResponse;
 import cotato.timetile.global.exception.UnauthorizedException;
+import cotato.timetile.global.properties.FrontendProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,15 +26,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @RequiredArgsConstructor
 public class LocalAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
     private static final String FILTER_PROCESSES_URL = "/api/auth/login";
+    private final FrontendProperties frontendProperties;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final JwtProvider jwtProvider;
 
     public LocalAuthenticationFilter(AuthenticationManager authenticationManager,
                                      CustomLoginFailureHandler customLoginFailureHandler,
-                                     JwtProvider jwtProvider) {
+                                     JwtProvider jwtProvider,
+                                     FrontendProperties frontendProperties) {
         super(authenticationManager);
         this.jwtProvider = jwtProvider;
+        this.frontendProperties = frontendProperties;
         setFilterProcessesUrl(FILTER_PROCESSES_URL);
         setAuthenticationFailureHandler(customLoginFailureHandler);
     }
@@ -60,7 +65,7 @@ public class LocalAuthenticationFilter extends UsernamePasswordAuthenticationFil
         UserPrincipal userDetails = (UserPrincipal) authResult.getPrincipal();
         String refreshToken = jwtProvider.generateRefreshToken(userDetails.getId());
         String accessToken = jwtProvider.generateAccessToken(refreshToken);
-
+        response.sendRedirect(frontendProperties.homeUrl());
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());

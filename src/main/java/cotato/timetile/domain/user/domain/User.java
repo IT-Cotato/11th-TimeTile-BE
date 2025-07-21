@@ -7,8 +7,10 @@ import cotato.timetile.domain.event.domain.Event;
 import cotato.timetile.domain.post.domain.Post;
 import cotato.timetile.domain.post.domain.PostLike;
 import cotato.timetile.domain.scrap.domain.ScrapFolder;
+import cotato.timetile.domain.user.api.dto.UserCreationDto;
 import cotato.timetile.global.common.TimeInfo;
 import cotato.timetile.global.common.Visibility;
+import cotato.timetile.global.util.EncryptUtil;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -100,6 +102,23 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<ArtistFollow> artistFollows = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<UserTermAgreement> agreements = new ArrayList<>();
+
+    public static User of(UserCreationDto dto) {
+        return User.builder()
+                .email(dto.email())
+                .password(dto.password() != null ? EncryptUtil.encrypt(dto.password()) : null)
+                .nickname(dto.nickname())
+                .introduction(dto.introduction())
+                .imageKey(dto.imageKey())
+                .provider(dto.provider())
+                .providerId(dto.providerId())
+                .role(Role.WATCHER)
+                .visibility(Visibility.PUBLIC)
+                .build();
+    }
+
     public void updateProfile(String nickname, String introduction, String imageKey) {
         if (StringUtils.hasText(nickname)) {
             this.nickname = nickname;
@@ -166,6 +185,10 @@ public class User {
 
     public void unfollow(ArtistFollow artistFollow) {
         this.artistFollows.remove(artistFollow);
+    }
+
+    public void agree(UserTermAgreement userTermAgreement) {
+        this.agreements.add(userTermAgreement);
     }
 
     public void increaseFollowingCount() {
