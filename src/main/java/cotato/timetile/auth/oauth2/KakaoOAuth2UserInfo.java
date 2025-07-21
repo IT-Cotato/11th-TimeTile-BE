@@ -12,5 +12,11 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
     public String getId() {
         return attributes.get("id").toString();
     }
-    
+
+    @Override
+    public String getEmail() {
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+        return kakaoAccount.get("email").toString();
+    }
+
 }

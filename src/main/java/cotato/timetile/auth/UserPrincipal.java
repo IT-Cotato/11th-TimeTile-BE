@@ -51,7 +51,7 @@ public class UserPrincipal implements UserDetails, OAuth2User {
 
     @Override
     public String getUsername() {
-        return "email";
+        return email;
     }
 
     @Override
@@ -68,5 +68,5 @@ public class UserPrincipal implements UserDetails, OAuth2User {
     public Map<String, Object> getAttributes() {
         return attributes;
     }
-    
+
 }
