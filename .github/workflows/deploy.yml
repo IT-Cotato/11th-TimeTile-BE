@@ -65,5 +65,5 @@ jobs:
             sudo docker rm -f timetile-server
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/timetile-server
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/timetile-server
-            sudo docker run -p 8080:8080 --name timetile-server -d ${{ secrets.DOCKERHUB_USERNAME }}/timetile-server
+            sudo docker run --network host -p 8080:8080 --name timetile-server -d ${{ secrets.DOCKERHUB_USERNAME }}/timetile-server
     
