@@ -16,4 +16,8 @@ public class UnauthorizedException extends CustomException {
         return new UnauthorizedException(ErrorResponse.INVALID_TOKEN);
     }
 
+    public static UnauthorizedException unverified() {
+        return new UnauthorizedException(ErrorResponse.UNVERIFIED_USER);
+    }
+
 }
