@@ -6,6 +6,7 @@ import cotato.timetile.auth.jwt.JwtProvider;
 import cotato.timetile.domain.user.api.response.LoginResponse;
 import cotato.timetile.global.common.CommonResponse;
 import cotato.timetile.global.common.SuccessResponse;
+import cotato.timetile.global.properties.FrontendProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
+    private final FrontendProperties frontendProperties;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final JwtProvider jwtProvider;
 
@@ -27,16 +29,23 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
-        UserPrincipal oAuth2User = (UserPrincipal) authentication.getPrincipal();
-        Long userId = oAuth2User.getId();
-        String refreshToken = jwtProvider.generateRefreshToken(userId);
-        String accessToken = jwtProvider.generateAccessToken(refreshToken);
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UnregisteredOAuth2User unregisteredOAuth2User) {
+            String temporaryToken = jwtProvider.generateTemporaryToken(unregisteredOAuth2User);
+            response.sendRedirect(frontendProperties.registerUrl() + temporaryToken);
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else if (principal instanceof UserPrincipal oAuth2User) {
+            Long userId = oAuth2User.getId();
+            String refreshToken = jwtProvider.generateRefreshToken(userId);
+            String accessToken = jwtProvider.generateAccessToken(refreshToken);
+            response.sendRedirect(frontendProperties.homeUrl());
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
+            response.getWriter().write(objectMapper.writeValueAsString(CommonResponse.success(
+                    SuccessResponse.OK, LoginResponse.of(accessToken, refreshToken))));
+        }
 
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
-        response.getWriter().write(objectMapper.writeValueAsString(CommonResponse.success(
-                SuccessResponse.OK, LoginResponse.of(accessToken, refreshToken))));
     }
 
 }

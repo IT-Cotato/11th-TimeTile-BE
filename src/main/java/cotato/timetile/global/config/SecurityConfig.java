@@ -9,6 +9,7 @@ import cotato.timetile.auth.filter.JwtAuthenticationFilter;
 import cotato.timetile.auth.filter.LocalAuthenticationFilter;
 import cotato.timetile.auth.jwt.JwtProvider;
 import cotato.timetile.auth.oauth2.OAuth2LoginSuccessHandler;
+import cotato.timetile.global.properties.FrontendProperties;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +45,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtProvider jwtProvider;
+    private final FrontendProperties frontendProperties;
 
     private static final String[] AUTH_WHITELIST = {
             "/**"
@@ -91,7 +93,8 @@ public class SecurityConfig {
 
     @Bean
     public LocalAuthenticationFilter localAuthenticationFilter(AuthenticationManager authenticationManager) {
-        return new LocalAuthenticationFilter(authenticationManager, customLoginFailureHandler, jwtProvider);
+        return new LocalAuthenticationFilter(authenticationManager, customLoginFailureHandler, jwtProvider,
+                frontendProperties);
     }
 
     @Bean

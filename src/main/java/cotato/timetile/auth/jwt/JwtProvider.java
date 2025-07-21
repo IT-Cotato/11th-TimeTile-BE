@@ -1,5 +1,8 @@
 package cotato.timetile.auth.jwt;
 
+import cotato.timetile.auth.oauth2.UnregisteredOAuth2User;
+import cotato.timetile.domain.user.api.dto.TemporaryTokenPayloadDto;
+import cotato.timetile.domain.user.domain.AuthProvider;
 import cotato.timetile.domain.user.domain.Role;
 import cotato.timetile.domain.user.persistence.UserRepository;
 import cotato.timetile.global.exception.UnauthorizedException;
@@ -23,6 +26,8 @@ public class JwtProvider {
     private static final Duration ACCESS_TOKEN_VALID_DURATION = Duration.ofHours(3);
     private static final String JWT_TYPE = "JWT";
     private static final String CLAIM_ROLE = "role";
+    private static final String CLAIM_PROVIDER = "provider";
+    private static final String CLAIM_EMAIL = "email";
     private final JwtProperties jwtProperties;
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
@@ -86,6 +91,32 @@ public class JwtProvider {
                 .expiration(new Date(now.getTime() + validDuration.toMillis()))
                 .signWith(KeyGenerator.getKeyFromString(jwtProperties.secretKey()))
                 .compact();
+    }
+
+    public String generateTemporaryToken(UnregisteredOAuth2User unregisteredOAuth2User) {
+        Date now = new Date();
+        return Jwts.builder()
+                .header().type(JWT_TYPE).and()
+                .issuedAt(now)
+                .subject(unregisteredOAuth2User.getProviderId())
+                .claim(CLAIM_PROVIDER, unregisteredOAuth2User.getProvider())
+                .claim(CLAIM_EMAIL, unregisteredOAuth2User.getEmail())
+                .expiration(new Date(now.getTime() + Duration.ofMinutes(30).toMillis()))
+                .signWith(KeyGenerator.getKeyFromString(jwtProperties.secretKey()))
+                .compact();
+    }
+
+    public TemporaryTokenPayloadDto parseFromTemporaryToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(KeyGenerator.getKeyFromString(jwtProperties.secretKey()))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return TemporaryTokenPayloadDto.of(
+                claims.get(CLAIM_EMAIL, String.class),
+                AuthProvider.from(claims.get(CLAIM_PROVIDER, String.class)),
+                claims.getSubject()
+        );
     }
 
 }
