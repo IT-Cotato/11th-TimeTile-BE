@@ -28,7 +28,7 @@ public class OAuth2SignupService {
     @Transactional
     public void register(OAuth2SignupRequest request) {
         validateRequiredTermsAgreed(request.agreementIds());
-        s3Handler.deleteNotAllowedFiles(List.of(request.imageKey()));
+        s3Handler.deleteNotAllowedFile(request.imageKey());
         User user = User.of(UserCreationDto.of(
                 request,
                 jwtProvider.parseFromTemporaryToken(request.temporaryToken()))

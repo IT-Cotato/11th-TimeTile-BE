@@ -77,6 +77,17 @@ public class S3Handler {
                 .toString();
     }
 
+    public void deleteNotAllowedFile(String mediaKey) {
+        if (mediaKey == null) {
+            return;
+        }
+        if (validateMetadata(mediaKey)) {
+            return;
+        }
+        deleteFile(mediaKey);
+        throw UnprocessableEntityException.invalid();
+    }
+
     public void deleteNotAllowedFiles(List<String> mediaKeys) {
         List<String> invalidMediaKeys = mediaKeys.stream()
                 .filter(key -> !validateMetadata(key))
