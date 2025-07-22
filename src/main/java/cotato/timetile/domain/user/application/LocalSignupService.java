@@ -64,7 +64,7 @@ public class LocalSignupService {
             throw UnauthorizedException.unverified();
         }
         validateRequiredTermsAgreed(request.agreementIds());
-        s3Handler.deleteNotAllowedFiles(List.of(request.imageKey()));
+        s3Handler.deleteNotAllowedFile(request.imageKey());
         User user = User.of(UserCreationDto.of(request));
         termRepository.findAllById(request.agreementIds())
                 .forEach(term -> user.agree(UserTermAgreement.of(user, term)));
