@@ -8,6 +8,7 @@ import cotato.timetile.domain.post.application.PostLoadService;
 import cotato.timetile.domain.post.application.PostRemovalService;
 import cotato.timetile.domain.post.application.PostUpdateService;
 import cotato.timetile.global.common.CommonResponse;
+import cotato.timetile.global.common.NumberParam;
 import cotato.timetile.global.common.SortBy;
 import cotato.timetile.global.common.SuccessResponse;
 import cotato.timetile.global.util.ApiResponseUtil;
@@ -52,7 +53,7 @@ public class PostController {
     @PreAuthorize(value = "hasAnyRole('WATCHER', 'LINKER', 'EDITOR', 'ADMIN')")
     @Operation(summary = "연도 및 월별 추가 조회")
     public ResponseEntity<CommonResponse<?>> loadMore(@PathVariable String groupId,
-                                                      @RequestParam Long lastPostId) {
+                                                      @RequestParam(required = false, defaultValue = NumberParam.LONG_MAX) Long lastPostId) {
         return ApiResponseUtil.success(SuccessResponse.OK, postLoadService.loadMore(groupId, lastPostId));
     }
 

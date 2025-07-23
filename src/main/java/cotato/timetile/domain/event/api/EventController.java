@@ -8,6 +8,7 @@ import cotato.timetile.domain.event.application.EventLoadService;
 import cotato.timetile.domain.event.application.EventRemovalService;
 import cotato.timetile.domain.event.application.EventUpdateService;
 import cotato.timetile.global.common.CommonResponse;
+import cotato.timetile.global.common.NumberParam;
 import cotato.timetile.global.common.SuccessResponse;
 import cotato.timetile.global.util.ApiResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,7 +60,7 @@ public class EventController {
     public ResponseEntity<CommonResponse<?>> loadMore(@PathVariable String artistId,
                                                       @RequestParam int year,
                                                       @RequestParam int month,
-                                                      @RequestParam Long lastEventId) {
+                                                      @RequestParam(required = false, defaultValue = NumberParam.LONG_MAX) Long lastEventId) {
         return ApiResponseUtil.success(SuccessResponse.OK,
                 eventLoadService.loadMore(artistId, year, month, lastEventId));
     }
