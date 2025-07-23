@@ -11,10 +11,10 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
 
-    public AccessTokenReissueResponse reissue(AccessTokenReissueRequest request) {
-        RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(request.refreshToken())
+    public AccessTokenReissueResponse reissue(String refreshToken) {
+        RefreshToken token = refreshTokenRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(UnauthorizedException::invalid);
-        String accessToken = jwtProvider.generateAccessToken(refreshToken.getRefreshToken());
+        String accessToken = jwtProvider.generateAccessToken(token.getRefreshToken());
         return AccessTokenReissueResponse.of(accessToken);
     }
 
