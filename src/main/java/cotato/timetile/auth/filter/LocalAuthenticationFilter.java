@@ -5,9 +5,6 @@ import cotato.timetile.auth.CustomLoginFailureHandler;
 import cotato.timetile.auth.UserPrincipal;
 import cotato.timetile.auth.jwt.JwtProvider;
 import cotato.timetile.domain.user.api.request.LocalLoginRequest;
-import cotato.timetile.domain.user.api.response.LoginResponse;
-import cotato.timetile.global.common.CommonResponse;
-import cotato.timetile.global.common.SuccessResponse;
 import cotato.timetile.global.exception.UnauthorizedException;
 import cotato.timetile.global.properties.FrontendProperties;
 import jakarta.servlet.FilterChain;
@@ -15,9 +12,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -65,12 +62,23 @@ public class LocalAuthenticationFilter extends UsernamePasswordAuthenticationFil
         UserPrincipal userDetails = (UserPrincipal) authResult.getPrincipal();
         String refreshToken = jwtProvider.generateRefreshToken(userDetails.getId());
         String accessToken = jwtProvider.generateAccessToken(refreshToken);
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
-        response.getWriter().write(objectMapper.writeValueAsString(
-                CommonResponse.success(SuccessResponse.OK, LoginResponse.of(accessToken, refreshToken)))
-        );
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(JwtProvider.ACCESS_TOKEN_VALID_DURATION)
+                .sameSite("Strict")
+                .build();
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(JwtProvider.REFRESH_TOKEN_VALID_DURATION)
+                .sameSite("Strict")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        response.sendRedirect(frontendProperties.homeUrl());
     }
 
 }

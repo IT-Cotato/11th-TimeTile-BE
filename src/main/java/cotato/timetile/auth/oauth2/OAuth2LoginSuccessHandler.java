@@ -1,18 +1,14 @@
 package cotato.timetile.auth.oauth2;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cotato.timetile.auth.UserPrincipal;
 import cotato.timetile.auth.jwt.JwtProvider;
-import cotato.timetile.domain.user.api.response.LoginResponse;
-import cotato.timetile.global.common.CommonResponse;
-import cotato.timetile.global.common.SuccessResponse;
 import cotato.timetile.global.properties.FrontendProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -22,7 +18,6 @@ import org.springframework.stereotype.Component;
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final FrontendProperties frontendProperties;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final JwtProvider jwtProvider;
 
     @Override
@@ -38,13 +33,24 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             Long userId = oAuth2User.getId();
             String refreshToken = jwtProvider.generateRefreshToken(userId);
             String accessToken = jwtProvider.generateAccessToken(refreshToken);
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
-            response.getWriter().write(objectMapper.writeValueAsString(CommonResponse.success(
-                    SuccessResponse.OK, LoginResponse.of(accessToken, refreshToken))));
+            ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(JwtProvider.ACCESS_TOKEN_VALID_DURATION)
+                    .sameSite("Strict")
+                    .build();
+            ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(JwtProvider.REFRESH_TOKEN_VALID_DURATION)
+                    .sameSite("Strict")
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+            response.sendRedirect(frontendProperties.homeUrl());
         }
-
     }
 
 }

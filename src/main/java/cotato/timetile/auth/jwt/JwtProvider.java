@@ -22,8 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class JwtProvider {
 
-    private static final Duration REFRESH_TOKEN_VALID_DURATION = Duration.ofDays(14);
-    private static final Duration ACCESS_TOKEN_VALID_DURATION = Duration.ofHours(3);
+    public static final Duration REFRESH_TOKEN_VALID_DURATION = Duration.ofDays(14);
+    public static final Duration ACCESS_TOKEN_VALID_DURATION = Duration.ofHours(3);
     private static final String JWT_TYPE = "JWT";
     private static final String CLAIM_ROLE = "role";
     private static final String CLAIM_PROVIDER = "provider";
