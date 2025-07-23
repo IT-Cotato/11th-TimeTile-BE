@@ -65,7 +65,6 @@ public class LocalAuthenticationFilter extends UsernamePasswordAuthenticationFil
         UserPrincipal userDetails = (UserPrincipal) authResult.getPrincipal();
         String refreshToken = jwtProvider.generateRefreshToken(userDetails.getId());
         String accessToken = jwtProvider.generateAccessToken(refreshToken);
-        response.sendRedirect(frontendProperties.homeUrl());
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());

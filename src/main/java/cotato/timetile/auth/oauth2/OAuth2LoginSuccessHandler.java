@@ -38,7 +38,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             Long userId = oAuth2User.getId();
             String refreshToken = jwtProvider.generateRefreshToken(userId);
             String accessToken = jwtProvider.generateAccessToken(refreshToken);
-            response.sendRedirect(frontendProperties.homeUrl());
             response.setStatus(HttpServletResponse.SC_OK);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
