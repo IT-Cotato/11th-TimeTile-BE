@@ -35,8 +35,7 @@ public class PostUpdateService {
         post.update(
                 PostUpdateDto.of(
                         request,
-                        mediaKeys.isEmpty() ? s3Handler.getSimpleLogoUrlIfNull(null)
-                                : request.mediaKeys().get(request.mainImageIndex())
+                        mediaKeys.isEmpty() ? null : request.mediaKeys().get(request.mainImageIndex())
                 )
         );
     }

@@ -34,8 +34,7 @@ public class PostCreationService {
         Post post = Post.of(
                 PostCreationDto.of(
                         request,
-                        mediaKeys.isEmpty() ? s3Handler.getSimpleLogoUrlIfNull(null)
-                                : request.mediaKeys().get(request.mainImageIndex()),
+                        mediaKeys.isEmpty() ? null : request.mediaKeys().get(request.mainImageIndex()),
                         event.getStartedAt(),
                         author
                 )
