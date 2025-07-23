@@ -25,6 +25,7 @@ import cotato.timetile.global.exception.NotFoundException;
 import cotato.timetile.global.handler.S3Handler;
 import cotato.timetile.global.util.DiffMatchPatcher;
 import cotato.timetile.global.util.DiffMatchPatcher.Diff;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
@@ -111,7 +112,7 @@ public class EventLoadService {
     }
 
     @Transactional(readOnly = true)
-    public EventLoadMoreResponse loadMore(String artistId, int year, int month, Long lastEventId) {
+    public EventLoadMoreResponse loadMore(String artistId, int year, int month, Integer lastDay, Long lastEventId) {
         QEvent e1 = QEvent.event;
         QEvent e2 = new QEvent("e2");
         BooleanExpression baseCondition = e1.startedAt.year().eq(year)
@@ -128,12 +129,13 @@ public class EventLoadService {
                                         e2.active.isTrue()
                                 )
                 ));
-        BooleanExpression cursorCondition = e1.id.lt(lastEventId);
+        BooleanExpression cursorCondition = e1.startedAt.dayOfMonth().lt(lastDay)
+                .or(e1.startedAt.dayOfMonth().eq(lastDay).and(e1.id.lt(lastEventId)));
 
         List<Event> fetched = jpaQueryFactory
                 .selectFrom(e1)
                 .where(baseCondition, cursorCondition)
-                .orderBy(e1.postCount.desc(), e1.id.desc())
+                .orderBy(e1.startedAt.desc(), e1.id.desc())
                 .limit(SLICE_SIZE + 1)
                 .fetch();
         boolean hasNext = fetched.size() > SLICE_SIZE;
@@ -144,6 +146,7 @@ public class EventLoadService {
                         .map(event -> EventLoadMoreDto.of(event, getRelatedEvents(event.getRelatedEvents())))
                         .toList(),
                 hasNext,
+                lastEventOpt.map(Event::getStartedAt).map(LocalDate::getDayOfMonth).orElse(null),
                 lastEventOpt.map(Event::getId).orElse(null)
         );
     }

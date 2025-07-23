@@ -60,9 +60,10 @@ public class EventController {
     public ResponseEntity<CommonResponse<?>> loadMore(@PathVariable String artistId,
                                                       @RequestParam int year,
                                                       @RequestParam int month,
+                                                      @RequestParam(required = false, defaultValue = NumberParam.DAY_MAX) Integer lastDay,
                                                       @RequestParam(required = false, defaultValue = NumberParam.LONG_MAX) Long lastEventId) {
         return ApiResponseUtil.success(SuccessResponse.OK,
-                eventLoadService.loadMore(artistId, year, month, lastEventId));
+                eventLoadService.loadMore(artistId, year, month, lastDay, lastEventId));
     }
 
     @GetMapping(value = "/{groupId}")
