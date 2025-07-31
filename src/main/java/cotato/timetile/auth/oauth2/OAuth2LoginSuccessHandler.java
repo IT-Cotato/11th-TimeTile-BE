@@ -38,14 +38,14 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                     .secure(true)
                     .path("/")
                     .maxAge(JwtProvider.ACCESS_TOKEN_VALID_DURATION)
-                    .sameSite("Strict")
+                    .sameSite("None")
                     .build();
             ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
                     .httpOnly(true)
                     .secure(true)
                     .path("/")
                     .maxAge(JwtProvider.REFRESH_TOKEN_VALID_DURATION)
-                    .sameSite("Strict")
+                    .sameSite("None")
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
             response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
