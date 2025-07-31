@@ -1,12 +1,12 @@
-package cotato.timetile.domain.post.api.response;
+package cotato.timetile.domain.profile.api.response;
 
-import cotato.timetile.domain.post.api.dto.PostLoadAllDto;
-import cotato.timetile.domain.post.domain.Post;
+import com.querydsl.core.Tuple;
+import cotato.timetile.domain.profile.api.dto.PostLoadAllOnProfileDto;
 import java.util.List;
 import org.springframework.data.domain.PageImpl;
 
-public record PostLoadAllResponse(
-        List<PostLoadAllDto> posts,
+public record PostLoadAllOnPageResponse(
+        List<PostLoadAllOnProfileDto> posts,
         int page,
         int size,
         int totalPages,
@@ -15,8 +15,8 @@ public record PostLoadAllResponse(
         boolean hasPrevious,
         boolean isLast
 ) {
-    public static PostLoadAllResponse of(List<PostLoadAllDto> posts, PageImpl<Post> postPage) {
-        return new PostLoadAllResponse(
+    public static PostLoadAllOnPageResponse of(List<PostLoadAllOnProfileDto> posts, PageImpl<Tuple> postPage) {
+        return new PostLoadAllOnPageResponse(
                 posts,
                 postPage.getNumber() + 1,
                 postPage.getSize(),
