@@ -1,8 +1,8 @@
 package cotato.timetile.domain.user.api.request;
 
-import jakarta.validation.constraints.NotBlank;
+import cotato.timetile.annotation.Image;
 
 public record UserLoadFileUrlRequest(
-        @NotBlank String extension
+        @Image String extension
 ) {
 }
