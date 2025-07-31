@@ -4,12 +4,14 @@ import cotato.timetile.domain.scrap.domain.ScrapFolder;
 
 public record ScrapFolderLoadAllDto(
         Long id,
-        String name
+        String name,
+        int scrapCount
 ) {
     public static ScrapFolderLoadAllDto of(ScrapFolder scrapFolder) {
         return new ScrapFolderLoadAllDto(
                 scrapFolder.getId(),
-                scrapFolder.getName()
+                scrapFolder.getName(),
+                scrapFolder.getScraps().size()
         );
     }
 }
