@@ -18,5 +18,5 @@ public class UserFileService {
         String url = s3Handler.generateSignedPutUrl(key);
         return UserLoadFileUrlResponse.of(key, url);
     }
-    
+
 }
