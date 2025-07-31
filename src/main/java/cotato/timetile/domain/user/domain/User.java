@@ -81,6 +81,8 @@ public class User {
 
     private int followerCount;
 
+    private int visitCount;
+
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Event> events = new ArrayList<>();
 
@@ -104,6 +106,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<UserTermAgreement> agreements = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<UserVisitLog> visitLogs = new ArrayList<>();
 
     public static User of(UserCreationDto dto) {
         return User.builder()
@@ -191,6 +196,11 @@ public class User {
         this.agreements.add(userTermAgreement);
     }
 
+    public void visit(UserVisitLog userVisitLog) {
+        this.visitLogs.add(userVisitLog);
+        this.visitCount++;
+    }
+
     public void increaseFollowingCount() {
         this.followingCount++;
     }
@@ -205,6 +215,10 @@ public class User {
 
     public void decreaseFollowerCount() {
         this.followerCount--;
+    }
+
+    public void updateRole() {
+        this.role = Role.isAssigned(this);
     }
 
 }
