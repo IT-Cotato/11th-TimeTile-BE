@@ -26,6 +26,7 @@ import org.springframework.data.elasticsearch.annotations.Setting;
 public class EventDocument {
 
     @Id
+    @Field(type = FieldType.Keyword)
     private String id;
 
     @Field(type = FieldType.Keyword)

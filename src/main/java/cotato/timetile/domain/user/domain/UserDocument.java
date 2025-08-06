@@ -1,4 +1,4 @@
-package cotato.timetile.domain.artist.domain;
+package cotato.timetile.domain.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Id;
@@ -14,14 +14,14 @@ import org.springframework.data.elasticsearch.annotations.InnerField;
 import org.springframework.data.elasticsearch.annotations.MultiField;
 import org.springframework.data.elasticsearch.annotations.Setting;
 
-@Document(indexName = "artists")
-@Setting(settingPath = "elasticsearch/artist-settings.json")
+@Document(indexName = "users")
+@Setting(settingPath = "elasticsearch/user-settings.json")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
 @Builder
-public class ArtistDocument {
+public class UserDocument {
 
     @Id
     @Field(type = FieldType.Keyword)
@@ -34,16 +34,12 @@ public class ArtistDocument {
                     @InnerField(suffix = "edge", type = FieldType.Text, analyzer = "edge_ngram_analyzer")
             }
     )
-    private String name;
+    private String nickname;
 
-    @Field(type = FieldType.Keyword)
-    private String imageUrl;
-
-    public static ArtistDocument of(Artist artist) {
-        return ArtistDocument.builder()
-                .id(artist.getId())
-                .name(artist.getName())
-                .imageUrl(artist.getImageUrl())
+    public static UserDocument of(User user) {
+        return UserDocument.builder()
+                .id(user.getId().toString())
+                .nickname(user.getNickname())
                 .build();
     }
 
