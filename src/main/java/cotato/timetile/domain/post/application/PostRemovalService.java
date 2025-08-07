@@ -3,6 +3,7 @@ package cotato.timetile.domain.post.application;
 import cotato.timetile.domain.event.domain.Event;
 import cotato.timetile.domain.event.persistence.EventRepository;
 import cotato.timetile.domain.post.domain.Post;
+import cotato.timetile.domain.post.listener.dto.PostRemovalEvent;
 import cotato.timetile.domain.post.persistence.PostRepository;
 import cotato.timetile.domain.user.domain.User;
 import cotato.timetile.domain.user.persistence.UserRepository;
@@ -10,6 +11,7 @@ import cotato.timetile.global.exception.ForbiddenException;
 import cotato.timetile.global.exception.NotFoundException;
 import cotato.timetile.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ public class PostRemovalService {
     private final PostRepository postRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public void remove(Long postId, Long userId) {
@@ -32,6 +35,7 @@ public class PostRemovalService {
                 .orElseThrow(NotFoundException::wrong);
         event.decreasePostCount();
         author.delete(post);
+        applicationEventPublisher.publishEvent(PostRemovalEvent.of(post));
     }
 
 }

@@ -11,6 +11,7 @@ import cotato.timetile.domain.user.api.response.EmailCheckResponse;
 import cotato.timetile.domain.user.api.response.EmailVerificationResponse;
 import cotato.timetile.domain.user.domain.User;
 import cotato.timetile.domain.user.domain.UserTermAgreement;
+import cotato.timetile.domain.user.listener.dto.UserCreationEvent;
 import cotato.timetile.domain.user.persistence.UserRepository;
 import cotato.timetile.global.exception.BadRequestException;
 import cotato.timetile.global.exception.UnauthorizedException;
@@ -21,6 +22,7 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +30,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LocalSignupService {
 
+    private static final int CODE_VALID_DURATION = 3;
+    private static final int VERIFIED_VALID_DURATION = 30;
     private final UserRepository userRepository;
     private final TermRepository termRepository;
     private final MailSender mailSender;
     private final RedisHandler redisHandler;
     private final S3Handler s3Handler;
-    private static final int CODE_VALID_DURATION = 3;
-    private static final int VERIFIED_VALID_DURATION = 30;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
     public EmailCheckResponse checkEmail(EmailCheckRequest request) {
@@ -69,6 +72,7 @@ public class LocalSignupService {
         termRepository.findAllById(request.agreementIds())
                 .forEach(term -> user.agree(UserTermAgreement.of(user, term)));
         userRepository.save(user);
+        applicationEventPublisher.publishEvent(UserCreationEvent.of(user));
     }
 
     private void validateRequiredTermsAgreed(List<Long> agreementIds) {
