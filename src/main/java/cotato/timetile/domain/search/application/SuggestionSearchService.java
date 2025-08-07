@@ -48,20 +48,26 @@ public class SuggestionSearchService {
                                     .should(s1 -> s1.prefix(m -> m
                                             .field("query.keyword")
                                             .value(prefix)
-                                            .boost(5.0f)
+                                            .boost(10.0f)
                                     ))
                                     .should(s2 -> s2.matchPhrasePrefix(m -> m
                                             .field("query.edge")
                                             .query(prefix)
-                                            .boost(3.0f)
+                                            .boost(5.0f)
                                     ))
                                     .should(s3 -> s3.match(m -> m
                                             .field("query")
                                             .query(prefix)
-                                            .boost(2.0f)
+                                            .boost(3.0f)
                                     ))
                                     .should(s4 -> s4.fuzzy(f -> f
                                             .field("query")
+                                            .value(prefix)
+                                            .fuzziness("AUTO")
+                                            .boost(1.1f)
+                                    ))
+                                    .should(s5 -> s5.fuzzy(f -> f
+                                            .field("query.edge")
                                             .value(prefix)
                                             .fuzziness("AUTO")
                                             .boost(0.8f)
