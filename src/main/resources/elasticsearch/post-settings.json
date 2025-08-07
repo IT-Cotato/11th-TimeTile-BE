@@ -1,0 +1,38 @@
+{
+  "analysis": {
+    "analyzer": {
+      "korean_english_analyzer": {
+        "type": "custom",
+        "tokenizer": "nori_tokenizer",
+        "filter": [
+          "lowercase",
+          "synonym_graph_filter"
+        ]
+      },
+      "edge_ngram_analyzer": {
+        "type": "custom",
+        "tokenizer": "edge_ngram_tokenizer",
+        "filter": [
+          "lowercase"
+        ]
+      }
+    },
+    "tokenizer": {
+      "edge_ngram_tokenizer": {
+        "type": "edge_ngram",
+        "min_gram": 1,
+        "max_gram": 10,
+        "token_chars": [
+          "letter",
+          "digit"
+        ]
+      }
+    },
+    "filter": {
+      "synonym_graph_filter": {
+        "type": "synonym_graph",
+        "synonyms_path": "synonyms.txt"
+      }
+    }
+  }
+}

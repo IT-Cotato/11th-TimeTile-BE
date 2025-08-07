@@ -42,4 +42,18 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     boolean existsByGroupIdAndAuthorIdAndActiveIsTrue(String groupId, Long authorId);
 
+    @Query(value = """
+            SELECT e1 FROM Event e1
+            WHERE e1.active = TRUE
+            AND e1.editedAt = (SELECT MAX(e2.editedAt) FROM Event e2
+                              WHERE e2.groupId IN :groupIds
+                              AND e2.groupId = e1.groupId
+                              AND e2.active = TRUE)
+            """
+    )
+    List<Event> findAllByGroupIdAndActiveIsTrueAndLatest(List<String> groupIds);
+
+    @Query("SELECT e FROM Event e JOIN FETCH e.artist WHERE e.id = :id")
+    Optional<Event> findByIdWithArtist(@Param("id") Long id);
+
 }

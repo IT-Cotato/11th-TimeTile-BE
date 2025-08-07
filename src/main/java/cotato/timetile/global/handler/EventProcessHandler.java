@@ -1,9 +1,9 @@
 package cotato.timetile.global.handler;
 
-import cotato.timetile.domain.event.domain.EventDocument;
-import cotato.timetile.domain.event.persistence.EventDocumentRepository;
+import cotato.timetile.domain.event.listener.dto.EventCreationEvent;
 import cotato.timetile.domain.event.persistence.EventRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +13,7 @@ public class EventProcessHandler {
 
     public static int REMOVE_THRESHOLD = 10;
     private final EventRepository eventRepository;
-    private final EventDocumentRepository eventDocumentRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public void removeIfWorthlessElseActivate(Long eventId) {
@@ -22,7 +22,7 @@ public class EventProcessHandler {
                 eventRepository.deleteById(eventId);
             } else {
                 event.activate();
-                eventDocumentRepository.save(EventDocument.of(event));
+                applicationEventPublisher.publishEvent(EventCreationEvent.of(event));
             }
         });
     }
