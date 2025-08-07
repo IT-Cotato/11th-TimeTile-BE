@@ -35,9 +35,9 @@ public class SuggestionSearchService {
                                     .must(m1 -> m1.range(r -> r.number(v -> v
                                             .field("length")
                                             .gte((double) prefix.length()))
-                                    )).should(s1 -> s1.match(m -> m
+                                    )).should(s1 -> s1.prefix(m -> m
                                             .field("query.keyword")
-                                            .query(prefix)
+                                            .value(prefix)
                                             .boost(10.0f)
                                     ))
                                     .should(s2 -> s2.matchPhrasePrefix(m -> m
@@ -51,6 +51,7 @@ public class SuggestionSearchService {
                                             .boost(3.0f)
                                     ))
                             ))
+                            .minScore(3.0)
                             .sort(sort -> sort
                                     .score(o -> o.order(SortOrder.Desc))
                             )
