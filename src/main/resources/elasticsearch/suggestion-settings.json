@@ -6,7 +6,9 @@
         "tokenizer": "nori_tokenizer",
         "filter": [
           "lowercase",
-          "synonym_graph_filter"
+          "synonym_graph_filter",
+          "nori_readingform",
+          "ngram_filter"
         ]
       },
       "edge_ngram_analyzer": {
@@ -17,18 +19,16 @@
         ]
       }
     },
-    "tokenizer": {
-      "edge_ngram_tokenizer": {
-        "type": "edge_ngram",
+    "filter": {
+      "ngram_filter": {
+        "type": "ngram",
         "min_gram": 2,
-        "max_gram": 10,
+        "max_gram": 5,
         "token_chars": [
           "letter",
           "digit"
         ]
-      }
-    },
-    "filter": {
+      },
       "synonym_graph_filter": {
         "type": "synonym_graph",
         "synonyms_path": "synonyms.txt"

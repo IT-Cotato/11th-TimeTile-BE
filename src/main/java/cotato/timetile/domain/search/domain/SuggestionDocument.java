@@ -38,12 +38,19 @@ public class SuggestionDocument {
     @Field(type = FieldType.Integer)
     private int length;
 
+    @Field(type = FieldType.Long)
+    private long count;
+
     public static SuggestionDocument of(String query) {
         return SuggestionDocument.builder()
                 .id(query)
                 .query(query)
                 .length(query.length())
                 .build();
+    }
+
+    public void increaseCount() {
+        this.count++;
     }
 
 }
