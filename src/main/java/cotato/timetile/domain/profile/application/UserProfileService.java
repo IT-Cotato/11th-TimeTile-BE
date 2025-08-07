@@ -3,15 +3,16 @@ package cotato.timetile.domain.profile.application;
 import cotato.timetile.domain.profile.api.request.UserProfileUpdateRequest;
 import cotato.timetile.domain.profile.api.response.UserGradeResponse;
 import cotato.timetile.domain.profile.api.response.UserProfileLoadResponse;
-import cotato.timetile.domain.user.api.request.NicknameCheckRequest;
 import cotato.timetile.domain.user.api.response.NicknameCheckResponse;
 import cotato.timetile.domain.user.domain.User;
+import cotato.timetile.domain.user.listener.dto.UserUpdateEvent;
 import cotato.timetile.domain.user.persistence.UserRepository;
 import cotato.timetile.global.exception.NotFoundException;
 import cotato.timetile.global.exception.UnauthorizedException;
 import cotato.timetile.global.handler.S3Handler;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +22,11 @@ public class UserProfileService {
 
     private final UserRepository userRepository;
     private final S3Handler s3Handler;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
-    public NicknameCheckResponse checkNickname(NicknameCheckRequest request) {
-        return NicknameCheckResponse.of(userRepository.findByNickname(request.nickname()).isEmpty());
+    public NicknameCheckResponse checkNickname(String nickname) {
+        return NicknameCheckResponse.of(userRepository.findByNickname(nickname).isEmpty());
     }
 
     @Transactional
@@ -33,6 +35,7 @@ public class UserProfileService {
         s3Handler.deleteNotAllowedFile(request.imageKey());
         s3Handler.deleteFile(user.getImageKey());
         user.updateProfile(request.nickname(), request.introduction(), request.imageKey());
+        applicationEventPublisher.publishEvent(UserUpdateEvent.of(user));
     }
 
     @Transactional

@@ -4,17 +4,13 @@ import cotato.timetile.global.common.S3Folder;
 import cotato.timetile.global.exception.UnprocessableEntityException;
 import cotato.timetile.global.properties.S3Properties;
 import cotato.timetile.global.util.FileUtil;
-import io.awspring.cloud.s3.ObjectMetadata;
 import io.awspring.cloud.s3.S3Operations;
-import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
@@ -29,16 +25,10 @@ public class S3Handler {
     private final S3Properties s3Properties;
     private final S3Client s3Client;
 
-    public void uploadFile(MultipartFile multipartFile, String key) {
-        try {
-            s3Operations.upload(s3Properties.bucket(), key, multipartFile.getInputStream(),
-                    ObjectMetadata.builder().contentType(multipartFile.getContentType()).build());
-        } catch (IOException e) {
-            throw cotato.timetile.global.exception.IOException.upload();
-        }
-    }
-
     public void deleteFile(String key) {
+        if (key == null) {
+            return;
+        }
         s3Operations.deleteObject(s3Properties.bucket(), key);
     }
 
@@ -49,15 +39,6 @@ public class S3Handler {
     public String generateSignedPutUrl(String key) {
 
         return s3Operations.createSignedPutURL(s3Properties.bucket(), key, PUT_VALID_DURATION).toString();
-    }
-
-    public String generateKey(MultipartFile multipartFile, S3Folder s3Folder) {
-        return String.format(
-                "%s/%s.%s",
-                s3Folder.toString().toLowerCase(),
-                UUID.randomUUID(),
-                FilenameUtils.getExtension(multipartFile.getOriginalFilename())
-        );
     }
 
     public String generateKey(String extension, S3Folder s3Folder) {
@@ -81,11 +62,10 @@ public class S3Handler {
         if (mediaKey == null) {
             return;
         }
-        if (validateMetadata(mediaKey)) {
-            return;
+        if (!validateMetadata(mediaKey)) {
+            throw UnprocessableEntityException.invalid();
         }
         deleteFile(mediaKey);
-        throw UnprocessableEntityException.invalid();
     }
 
     public void deleteNotAllowedFiles(List<String> mediaKeys) {

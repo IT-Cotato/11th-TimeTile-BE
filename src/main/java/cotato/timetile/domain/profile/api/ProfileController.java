@@ -7,7 +7,6 @@ import cotato.timetile.domain.profile.application.EventProfileService;
 import cotato.timetile.domain.profile.application.FollowProfileService;
 import cotato.timetile.domain.profile.application.PostProfileService;
 import cotato.timetile.domain.profile.application.UserProfileService;
-import cotato.timetile.domain.user.api.request.NicknameCheckRequest;
 import cotato.timetile.global.common.CommonResponse;
 import cotato.timetile.global.common.NumberParam;
 import cotato.timetile.global.common.SuccessResponse;
@@ -21,9 +20,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,14 +41,14 @@ public class ProfileController {
 
     @GetMapping(value = "/profile/nickname/check")
     @Operation(summary = "닉네임 중복 확인")
-    public ResponseEntity<CommonResponse<?>> checkNickname(@Valid @ModelAttribute NicknameCheckRequest request) {
-        return ApiResponseUtil.success(SuccessResponse.OK, userProfileService.checkNickname(request));
+    public ResponseEntity<CommonResponse<?>> checkNickname(@Valid @RequestParam String nickname) {
+        return ApiResponseUtil.success(SuccessResponse.OK, userProfileService.checkNickname(nickname));
     }
 
     @PutMapping(value = "/me/profile")
     @PreAuthorize(value = "isAuthenticated()")
     @Operation(summary = "수정")
-    public ResponseEntity<CommonResponse<?>> update(@Valid @ModelAttribute UserProfileUpdateRequest request,
+    public ResponseEntity<CommonResponse<?>> update(@Valid @RequestBody UserProfileUpdateRequest request,
                                                     @AuthenticationPrincipal UserPrincipal userPrincipal) {
         userProfileService.update(request, userPrincipal.getId());
         return ApiResponseUtil.success(SuccessResponse.OK);
