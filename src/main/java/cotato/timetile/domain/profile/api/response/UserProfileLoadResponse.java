@@ -1,5 +1,7 @@
 package cotato.timetile.domain.profile.api.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import cotato.timetile.domain.user.domain.Role;
 import cotato.timetile.domain.user.domain.User;
 import cotato.timetile.global.common.Visibility;
@@ -13,9 +15,10 @@ public record UserProfileLoadResponse(
         int followingCount,
         int followerCount,
         int postCount,
-        String introduction
+        String introduction,
+        @JsonInclude(Include.NON_NULL) Boolean isFollowing
 ) {
-    public static UserProfileLoadResponse of(User user, String profileImageUrl, int postCount) {
+    public static UserProfileLoadResponse of(User user, String profileImageUrl, int postCount, Boolean isFollowing) {
         return new UserProfileLoadResponse(
                 user.getId(),
                 user.getNickname(),
@@ -25,7 +28,8 @@ public record UserProfileLoadResponse(
                 user.getFollowingCount(),
                 user.getFollowerCount(),
                 postCount,
-                user.getIntroduction()
+                user.getIntroduction(),
+                isFollowing
         );
     }
 }

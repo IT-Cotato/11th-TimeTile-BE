@@ -6,6 +6,7 @@ import cotato.timetile.domain.profile.api.response.UserProfileLoadResponse;
 import cotato.timetile.domain.user.api.response.NicknameCheckResponse;
 import cotato.timetile.domain.user.domain.User;
 import cotato.timetile.domain.user.listener.dto.UserUpdateEvent;
+import cotato.timetile.domain.user.persistence.UserFollowRepository;
 import cotato.timetile.domain.user.persistence.UserRepository;
 import cotato.timetile.global.exception.NotFoundException;
 import cotato.timetile.global.exception.UnauthorizedException;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserProfileService {
 
     private final UserRepository userRepository;
+    private final UserFollowRepository userFollowRepository;
     private final S3Handler s3Handler;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -45,11 +47,20 @@ public class UserProfileService {
     }
 
     @Transactional(readOnly = true)
-    public UserProfileLoadResponse loadProfile(Long targetId) {
+    public UserProfileLoadResponse loadMyProfile(Long targetId) {
         User user = userRepository.findById(targetId).orElseThrow(NotFoundException::wrong);
         String profileImageUrl = s3Handler.getSimpleLogoUrlIfNull(user.getImageKey());
         int postCount = user.getPosts().size();
-        return UserProfileLoadResponse.of(user, profileImageUrl, postCount);
+        return UserProfileLoadResponse.of(user, profileImageUrl, postCount, null);
+    }
+
+    @Transactional(readOnly = true)
+    public UserProfileLoadResponse loadOtherUserProfile(Long targetId, Long userId) {
+        User user = userRepository.findById(targetId).orElseThrow(NotFoundException::wrong);
+        String profileImageUrl = s3Handler.getSimpleLogoUrlIfNull(user.getImageKey());
+        int postCount = user.getPosts().size();
+        boolean isFollowing = userFollowRepository.findByFollowingIdAndFollowerId(userId, targetId).isPresent();
+        return UserProfileLoadResponse.of(user, profileImageUrl, postCount, isFollowing);
     }
 
     @Transactional(readOnly = true)
