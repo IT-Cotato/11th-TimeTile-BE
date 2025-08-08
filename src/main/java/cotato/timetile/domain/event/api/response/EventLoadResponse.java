@@ -1,6 +1,6 @@
 package cotato.timetile.domain.event.api.response;
 
-import cotato.timetile.domain.artist.domain.Artist;
+import cotato.timetile.domain.event.api.dto.RelatedArtistDto;
 import cotato.timetile.domain.event.api.dto.RelatedEventDto;
 import cotato.timetile.domain.event.domain.ActivityType;
 import cotato.timetile.domain.event.domain.Event;
@@ -14,19 +14,20 @@ public record EventLoadResponse(
         String source,
         List<ActivityType> activityTypes,
         List<RelatedEventDto> relatedEvents,
-        List<String> relatedArtists,
+        List<RelatedArtistDto> relatedArtists,
         List<String> relatedMaterials,
         LocalDate startedAt,
         LocalDate endedAt
 ) {
-    public static EventLoadResponse of(Event event, List<RelatedEventDto> relatedEvents) {
+    public static EventLoadResponse of(Event event,
+                                       List<RelatedEventDto> relatedEvents) {
         return new EventLoadResponse(
                 event.getName(),
                 event.getDescription(),
                 event.getSource(),
                 event.getActivityTypes(),
                 relatedEvents,
-                event.getRelatedArtists().stream().map(RelatedArtist::getArtist).map(Artist::getName).toList(),
+                event.getRelatedArtists().stream().map(RelatedArtist::getArtist).map(RelatedArtistDto::of).toList(),
                 event.getRelatedMaterials(),
                 event.getStartedAt(),
                 event.getEndedAt()
