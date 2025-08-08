@@ -58,14 +58,16 @@ public class ProfileController {
     @PreAuthorize(value = "isAuthenticated()")
     @Operation(summary = "내 프로필 조회")
     public ResponseEntity<CommonResponse<?>> loadProfile(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ApiResponseUtil.success(SuccessResponse.OK, userProfileService.loadProfile(userPrincipal.getId()));
+        return ApiResponseUtil.success(SuccessResponse.OK, userProfileService.loadMyProfile(userPrincipal.getId()));
     }
 
     @GetMapping(value = "/{targetId}/profile")
     @PreAuthorize(value = "isAuthenticated()")
     @Operation(summary = "다른 유저 프로필 조회")
-    public ResponseEntity<CommonResponse<?>> loadProfile(@PathVariable Long targetId) {
-        return ApiResponseUtil.success(SuccessResponse.OK, userProfileService.loadProfile(targetId));
+    public ResponseEntity<CommonResponse<?>> loadProfile(@PathVariable Long targetId,
+                                                         @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ApiResponseUtil.success(SuccessResponse.OK,
+                userProfileService.loadOtherUserProfile(targetId, userPrincipal.getId()));
     }
 
     @GetMapping(value = "/me/grade")

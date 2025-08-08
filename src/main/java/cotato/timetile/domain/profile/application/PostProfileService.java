@@ -8,9 +8,11 @@ import cotato.timetile.domain.post.domain.Post;
 import cotato.timetile.domain.post.domain.QPost;
 import cotato.timetile.domain.post.domain.QPostLike;
 import cotato.timetile.domain.profile.api.dto.PostLoadAllOnProfileDto;
+import cotato.timetile.domain.profile.api.dto.PostWithAuthorLoadAllOnProfileDto;
 import cotato.timetile.domain.profile.api.response.PostLoadAllOnLimitResponse;
 import cotato.timetile.domain.profile.api.response.PostLoadAllOnPageResponse;
 import cotato.timetile.domain.profile.api.response.PostLoadAllOnSliceResponse;
+import cotato.timetile.domain.profile.api.response.PostWithAuthorLoadAllOnPageResponse;
 import cotato.timetile.domain.scrap.domain.QScrap;
 import cotato.timetile.domain.user.domain.User;
 import cotato.timetile.domain.user.persistence.UserFollowRepository;
@@ -137,7 +139,7 @@ public class PostProfileService {
     }
 
     @Transactional(readOnly = true)
-    public PostLoadAllOnPageResponse loadLikedPosts(int page, Long userId) {
+    public PostWithAuthorLoadAllOnPageResponse loadLikedPosts(int page, Long userId) {
         QPostLike pl = QPostLike.postLike;
         QEvent e1 = QEvent.event, e2 = new QEvent("e2");
 
@@ -154,15 +156,16 @@ public class PostProfileService {
 
         Long total = querydslHelper.getTotalCount(pl, pl.id, condition);
 
-        return PostLoadAllOnPageResponse.of(
+        return PostWithAuthorLoadAllOnPageResponse.of(
                 tuples.stream()
                         .map(tuple -> {
                             Post post = Objects.requireNonNull(tuple.get(pl)).getPost();
                             Event event = Objects.requireNonNull(tuple.get(e1));
-                            return PostLoadAllOnProfileDto.of(
+                            return PostWithAuthorLoadAllOnProfileDto.of(
                                     post,
                                     s3Handler.getSimpleLogoUrlIfNull(post.getMainImageKey()),
-                                    event
+                                    event,
+                                    s3Handler.getSimpleLogoUrlIfNull(post.getAuthor().getImageKey())
                             );
                         }).toList(),
                 new PageImpl<>(tuples, pageable, total)
@@ -170,7 +173,7 @@ public class PostProfileService {
     }
 
     @Transactional(readOnly = true)
-    public PostLoadAllOnPageResponse loadScrappedPosts(int page, Long userId) {
+    public PostWithAuthorLoadAllOnPageResponse loadScrappedPosts(int page, Long userId) {
         QScrap s = QScrap.scrap;
         QEvent e1 = QEvent.event, e2 = new QEvent("e2");
 
@@ -187,15 +190,16 @@ public class PostProfileService {
 
         Long total = querydslHelper.getTotalCount(s, s.id, condition);
 
-        return PostLoadAllOnPageResponse.of(
+        return PostWithAuthorLoadAllOnPageResponse.of(
                 tuples.stream()
                         .map(tuple -> {
                             Post post = Objects.requireNonNull(Objects.requireNonNull(tuple.get(s)).getPost());
                             Event event = Objects.requireNonNull(tuple.get(e1));
-                            return PostLoadAllOnProfileDto.of(
+                            return PostWithAuthorLoadAllOnProfileDto.of(
                                     post,
                                     s3Handler.getSimpleLogoUrlIfNull(post.getMainImageKey()),
-                                    event
+                                    event,
+                                    s3Handler.getSimpleLogoUrlIfNull(post.getAuthor().getImageKey())
                             );
                         }).toList(),
                 new PageImpl<>(tuples, pageable, total)
@@ -203,7 +207,7 @@ public class PostProfileService {
     }
 
     @Transactional(readOnly = true)
-    public PostLoadAllOnPageResponse loadScrappedPostsInFolder(Long scrapFolderId, int page, Long userId) {
+    public PostWithAuthorLoadAllOnPageResponse loadScrappedPostsInFolder(Long scrapFolderId, int page, Long userId) {
         QScrap s = QScrap.scrap;
         QEvent e1 = QEvent.event, e2 = new QEvent("e2");
 
@@ -220,15 +224,16 @@ public class PostProfileService {
 
         Long total = querydslHelper.getTotalCount(s, s.id, condition);
 
-        return PostLoadAllOnPageResponse.of(
+        return PostWithAuthorLoadAllOnPageResponse.of(
                 tuples.stream()
                         .map(tuple -> {
                             Post post = Objects.requireNonNull(Objects.requireNonNull(tuple.get(s)).getPost());
                             Event event = Objects.requireNonNull(tuple.get(e1));
-                            return PostLoadAllOnProfileDto.of(
+                            return PostWithAuthorLoadAllOnProfileDto.of(
                                     post,
                                     s3Handler.getSimpleLogoUrlIfNull(post.getMainImageKey()),
-                                    event
+                                    event,
+                                    s3Handler.getSimpleLogoUrlIfNull(post.getAuthor().getImageKey())
                             );
                         }).toList(),
                 new PageImpl<>(tuples, pageable, total)
