@@ -7,6 +7,7 @@ import cotato.timetile.domain.scrap.api.request.ScrapRequest;
 import cotato.timetile.domain.scrap.api.response.ScrapStatusLoadResponse;
 import cotato.timetile.domain.scrap.domain.Scrap;
 import cotato.timetile.domain.scrap.domain.ScrapFolder;
+import cotato.timetile.domain.scrap.persistence.ScrapRepository;
 import cotato.timetile.domain.user.domain.User;
 import cotato.timetile.domain.user.persistence.UserRepository;
 import cotato.timetile.global.exception.ForbiddenException;
@@ -24,6 +25,7 @@ public class ScrapService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final ScrapRepository scrapRepository;
 
     @Transactional(readOnly = true)
     public ScrapStatusLoadResponse loadScrapStatus(Long postId, Long userId) {
@@ -42,6 +44,17 @@ public class ScrapService {
         List<ScrapFolder> scrapFolders = scrapper.getScrapFolders();
         validateScrapFolders(scrapFolders, request.scrapFolderIds());
         updateScraps(scrapFolders, post, request.scrapFolderIds());
+    }
+
+    @Transactional
+    public void unscrap(Long postId, Long scrapFolderId, Long userId) {
+        User scrapper = userRepository.findById(userId).orElseThrow(UnauthorizedException::failed);
+        ScrapFolder scrapFolder = scrapper.getScrapFolders().stream()
+                .filter(sf -> sf.getId().equals(scrapFolderId)).findFirst()
+                .orElseThrow(ForbiddenException::wrong);
+        Scrap scrap = scrapRepository.findByPostIdAndScrapFolderId(postId, scrapFolderId)
+                .orElseThrow(NotFoundException::wrong);
+        scrapFolder.removeScrap(scrap);
     }
 
     private void validateScrapFolders(List<ScrapFolder> scrapFolders, List<Long> requestedFolderIds) {

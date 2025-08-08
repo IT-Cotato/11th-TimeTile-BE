@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +44,16 @@ public class ScrapController {
                                                    @AuthenticationPrincipal UserPrincipal userPrincipal) {
         scrapService.scrap(request, postId, userPrincipal.getId());
         return ApiResponseUtil.success(SuccessResponse.CREATED);
+    }
+
+    @DeleteMapping(value = "/{scrapFolderId}")
+    @PreAuthorize(value = "hasAnyRole('WATCHER', 'LINKER', 'EDITOR', 'ADMIN')")
+    @Operation(summary = "스크랩 취소")
+    public ResponseEntity<CommonResponse<?>> unscrap(@PathVariable Long postId,
+                                                     @PathVariable Long scrapFolderId,
+                                                     @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        scrapService.unscrap(postId, scrapFolderId, userPrincipal.getId());
+        return ApiResponseUtil.success(SuccessResponse.OK);
     }
 
 }
