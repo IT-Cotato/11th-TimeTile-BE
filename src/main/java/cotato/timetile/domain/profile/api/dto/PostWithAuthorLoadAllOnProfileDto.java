@@ -17,10 +17,11 @@ public record PostWithAuthorLoadAllOnProfileDto(
         int commentCount,
         Long authorId,
         String authorNickname,
-        String authorProfileImageUrl
+        String authorProfileImageUrl,
+        boolean isScrapped
 ) {
     public static PostWithAuthorLoadAllOnProfileDto of(Post post, String mainImageUrl, Event event,
-                                                       String authorProfileImageUrl) {
+                                                       String authorProfileImageUrl, boolean isScrapped) {
         return new PostWithAuthorLoadAllOnProfileDto(
                 event.getName(),
                 post.getGroupId(),
@@ -34,7 +35,8 @@ public record PostWithAuthorLoadAllOnProfileDto(
                 post.getCommentCount(),
                 post.getAuthor().getId(),
                 post.getAuthor().getNickname(),
-                authorProfileImageUrl
+                authorProfileImageUrl,
+                isScrapped
         );
     }
 }

@@ -14,6 +14,7 @@ import cotato.timetile.domain.profile.api.response.PostLoadAllOnPageResponse;
 import cotato.timetile.domain.profile.api.response.PostLoadAllOnSliceResponse;
 import cotato.timetile.domain.profile.api.response.PostWithAuthorLoadAllOnPageResponse;
 import cotato.timetile.domain.scrap.domain.QScrap;
+import cotato.timetile.domain.scrap.persistence.ScrapRepository;
 import cotato.timetile.domain.user.domain.User;
 import cotato.timetile.domain.user.persistence.UserFollowRepository;
 import cotato.timetile.domain.user.persistence.UserRepository;
@@ -39,11 +40,13 @@ public class PostProfileService {
     private static final int POST_ON_PROFILE_SIZE = 10;
     private final UserFollowRepository userFollowRepository;
     private final UserRepository userRepository;
+    private final ScrapRepository scrapRepository;
     private final QuerydslHelper querydslHelper;
     private final S3Handler s3Handler;
 
     @Transactional(readOnly = true)
     public PostLoadAllOnLimitResponse loadPostsOnMyProfile(Long userId) {
+
         QPost p = QPost.post;
         QEvent e1 = QEvent.event, e2 = new QEvent("e2");
 
@@ -63,7 +66,8 @@ public class PostProfileService {
                             return PostLoadAllOnProfileDto.of(
                                     post,
                                     s3Handler.getSimpleLogoUrlIfNull(post.getMainImageKey()),
-                                    event
+                                    event,
+                                    scrapRepository.existsByScrapFolder_Creator_IdAndPost_Id(userId, post.getId())
                             );
                         }).toList()
         );
@@ -97,7 +101,8 @@ public class PostProfileService {
                             return PostLoadAllOnProfileDto.of(
                                     post,
                                     s3Handler.getSimpleLogoUrlIfNull(post.getMainImageKey()),
-                                    event
+                                    event,
+                                    scrapRepository.existsByScrapFolder_Creator_IdAndPost_Id(userId, post.getId())
                             );
                         }).toList(),
                 hasNext,
@@ -131,7 +136,8 @@ public class PostProfileService {
                             return PostLoadAllOnProfileDto.of(
                                     Objects.requireNonNull(post),
                                     s3Handler.getSimpleLogoUrlIfNull(post.getMainImageKey()),
-                                    Objects.requireNonNull(event)
+                                    Objects.requireNonNull(event),
+                                    scrapRepository.existsByScrapFolder_Creator_IdAndPost_Id(userId, post.getId())
                             );
                         }).toList(),
                 new PageImpl<>(tuples, pageable, total)
@@ -165,7 +171,8 @@ public class PostProfileService {
                                     post,
                                     s3Handler.getSimpleLogoUrlIfNull(post.getMainImageKey()),
                                     event,
-                                    s3Handler.getSimpleLogoUrlIfNull(post.getAuthor().getImageKey())
+                                    s3Handler.getSimpleLogoUrlIfNull(post.getAuthor().getImageKey()),
+                                    scrapRepository.existsByScrapFolder_Creator_IdAndPost_Id(userId, post.getId())
                             );
                         }).toList(),
                 new PageImpl<>(tuples, pageable, total)
@@ -199,7 +206,8 @@ public class PostProfileService {
                                     post,
                                     s3Handler.getSimpleLogoUrlIfNull(post.getMainImageKey()),
                                     event,
-                                    s3Handler.getSimpleLogoUrlIfNull(post.getAuthor().getImageKey())
+                                    s3Handler.getSimpleLogoUrlIfNull(post.getAuthor().getImageKey()),
+                                    true
                             );
                         }).toList(),
                 new PageImpl<>(tuples, pageable, total)
@@ -233,7 +241,8 @@ public class PostProfileService {
                                     post,
                                     s3Handler.getSimpleLogoUrlIfNull(post.getMainImageKey()),
                                     event,
-                                    s3Handler.getSimpleLogoUrlIfNull(post.getAuthor().getImageKey())
+                                    s3Handler.getSimpleLogoUrlIfNull(post.getAuthor().getImageKey()),
+                                    true
                             );
                         }).toList(),
                 new PageImpl<>(tuples, pageable, total)

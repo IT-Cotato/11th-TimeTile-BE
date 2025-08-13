@@ -5,8 +5,10 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import cotato.timetile.domain.artist.domain.Artist;
 import cotato.timetile.domain.artist.domain.QArtist;
+import cotato.timetile.domain.event.api.dto.RelatedEventDto;
 import cotato.timetile.domain.event.domain.Event;
 import cotato.timetile.domain.event.domain.QEvent;
+import cotato.timetile.domain.event.persistence.EventRepository;
 import cotato.timetile.domain.profile.api.dto.ArtistFilterDto;
 import cotato.timetile.domain.profile.api.dto.EventLoadAllOnProfileDto;
 import cotato.timetile.domain.profile.api.response.ArtistFilterResponse;
@@ -26,6 +28,7 @@ public class EventProfileService {
     private static final int EVENT_PAGE_SIZE = 5;
     private final JPAQueryFactory jpaQueryFactory;
     private final QuerydslHelper querydslHelper;
+    private final EventRepository eventRepository;
 
     @Transactional(readOnly = true)
     public ArtistFilterResponse loadMyEventArtists(Long userId) {
@@ -76,7 +79,13 @@ public class EventProfileService {
 
         return EventLoadAllOnPageResponse.of(
                 events.stream()
-                        .map(EventLoadAllOnProfileDto::of)
+                        .map(event -> EventLoadAllOnProfileDto.of(
+                                event,
+                                eventRepository.findAllByGroupIdAndActiveIsTrueAndLatest(event.getRelatedEvents())
+                                        .stream()
+                                        .map(RelatedEventDto::of)
+                                        .toList()
+                        ))
                         .toList(),
                 new PageImpl<>(events, pageable, total)
         );

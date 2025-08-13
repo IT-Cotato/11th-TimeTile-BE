@@ -14,9 +14,10 @@ public record PostLoadAllOnProfileDto(
         String mainImageUrl,
         LocalDateTime createdAt,
         int likeCount,
-        int commentCount
+        int commentCount,
+        boolean isScrapped
 ) {
-    public static PostLoadAllOnProfileDto of(Post post, String mainImageUrl, Event event) {
+    public static PostLoadAllOnProfileDto of(Post post, String mainImageUrl, Event event, boolean isScrapped) {
         return new PostLoadAllOnProfileDto(
                 event.getName(),
                 post.getGroupId(),
@@ -27,7 +28,8 @@ public record PostLoadAllOnProfileDto(
                 mainImageUrl,
                 post.getTimeInfo().getCreatedAt(),
                 post.getLikeCount(),
-                post.getCommentCount()
+                post.getCommentCount(),
+                isScrapped
         );
     }
 }

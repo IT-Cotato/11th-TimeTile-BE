@@ -10,4 +10,6 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
 
     Optional<Scrap> findByPostIdAndScrapFolderId(Long postId, Long scrapFolderId);
 
+    boolean existsByScrapFolder_Creator_IdAndPost_Id(Long userId, Long postId);
+    
 }
