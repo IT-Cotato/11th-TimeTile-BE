@@ -40,8 +40,8 @@ public class LocalSignupService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
-    public EmailCheckResponse checkEmail(EmailCheckRequest request) {
-        return EmailCheckResponse.of(userRepository.findByEmail(request.email()).isEmpty());
+    public EmailCheckResponse checkEmail(String email) {
+        return EmailCheckResponse.of(userRepository.findByEmail(email).isEmpty());
     }
 
     public void sendCode(EmailCheckRequest request) {
