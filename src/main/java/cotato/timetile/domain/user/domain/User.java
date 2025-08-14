@@ -6,6 +6,7 @@ import cotato.timetile.domain.comment.domain.CommentLike;
 import cotato.timetile.domain.event.domain.Event;
 import cotato.timetile.domain.post.domain.Post;
 import cotato.timetile.domain.post.domain.PostLike;
+import cotato.timetile.domain.profile.api.request.UserProfileUpdateRequest;
 import cotato.timetile.domain.scrap.domain.ScrapFolder;
 import cotato.timetile.domain.user.api.dto.UserCreationDto;
 import cotato.timetile.global.common.TimeInfo;
@@ -29,7 +30,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.StringUtils;
 
 @Table(name = "users")
 @Entity
@@ -124,16 +124,10 @@ public class User {
                 .build();
     }
 
-    public void updateProfile(String nickname, String introduction, String imageKey) {
-        if (StringUtils.hasText(nickname)) {
-            this.nickname = nickname;
-        }
-        if (StringUtils.hasText(introduction)) {
-            this.introduction = introduction;
-        }
-        if (StringUtils.hasText(imageKey)) {
-            this.imageKey = imageKey;
-        }
+    public void updateProfile(UserProfileUpdateRequest request) {
+        this.nickname = request.nickname();
+        this.introduction = request.introduction();
+        this.imageKey = request.imageKey();
     }
 
     public void write(Event event) {

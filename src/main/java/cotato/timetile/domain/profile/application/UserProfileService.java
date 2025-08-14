@@ -12,6 +12,7 @@ import cotato.timetile.global.exception.NotFoundException;
 import cotato.timetile.global.exception.UnauthorizedException;
 import cotato.timetile.global.handler.S3Handler;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -34,9 +35,11 @@ public class UserProfileService {
     @Transactional
     public void update(UserProfileUpdateRequest request, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UnauthorizedException::failed);
-        s3Handler.deleteNotAllowedFile(request.imageKey());
-        s3Handler.deleteFile(user.getImageKey());
-        user.updateProfile(request.nickname(), request.introduction(), request.imageKey());
+        if (!Objects.equals(request.imageKey(), user.getImageKey())) {
+            s3Handler.deleteNotAllowedFile(request.imageKey());
+            s3Handler.deleteFile(user.getImageKey());
+        }
+        user.updateProfile(request);
         applicationEventPublisher.publishEvent(UserUpdateEvent.of(user));
     }
 
