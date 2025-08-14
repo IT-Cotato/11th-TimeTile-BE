@@ -3,6 +3,7 @@ package cotato.timetile.global.config;
 import cotato.timetile.auth.CustomAccessDeniedHandler;
 import cotato.timetile.auth.CustomAuthenticationEntryPoint;
 import cotato.timetile.auth.CustomLoginFailureHandler;
+import cotato.timetile.auth.CustomLogoutSuccessHandler;
 import cotato.timetile.auth.CustomOAuth2UserService;
 import cotato.timetile.auth.CustomUserDetailsService;
 import cotato.timetile.auth.filter.JwtAuthenticationFilter;
@@ -42,6 +43,7 @@ public class SecurityConfig {
     private final CustomLoginFailureHandler customLoginFailureHandler;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtProvider jwtProvider;
@@ -59,7 +61,13 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .logout(AbstractHttpConfigurer::disable)
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
+                        .deleteCookies("accessToken", "refreshToken")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .userDetailsService(customUserDetailsService)
                 .authorizeHttpRequests(auth -> auth
